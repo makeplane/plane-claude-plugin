@@ -129,6 +129,12 @@ methods need help:
 - **AIO**: needs `ENABLE_RUNNER=1`.
 - **Podman**: `references/other-platforms.md` lists the units to start.
 
+Some known services ship off and stay off unless needed. They aren't unknown services:
+- `importer-worker` (large imports)
+- `integration-event-consumer` (the integration event stream)
+- `pi-agent-worker` (part of Plane AI)
+- on Kubernetes, `external_api`, `worker_importers` and `drawio`
+
 ## Step 3 — Confirm a plan
 
 Before changing anything, show a plan and wait for a yes: edition, method, version, target
