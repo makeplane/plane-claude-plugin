@@ -1,0 +1,16 @@
+{
+  "name": "plane-self-hosting",
+  "displayName": "Plane Self-Hosting",
+  "version": "1.0.0",
+  "description": "Deploy, upgrade and troubleshoot self-hosted Plane (Community or Commercial) on your own infrastructure. Claude probes your Docker host or Kubernetes cluster, asks which install method and add-on services you want, then installs, verifies and hands you a runbook.",
+  "author": {
+    "name": "Plane",
+    "url": "https://plane.so"
+  },
+  "homepage": "https://developers.plane.so/self-hosting/overview",
+  "repository": "https://github.com/makeplane/plane-claude-plugin",
+  "license": "Apache-2.0",
+  "keywords": ["plane", "self-hosting", "deployment", "docker", "docker-compose", "kubernetes", "helm", "prime-cli", "airgapped"],
+  "documentationUrl": "https://developers.plane.so/self-hosting/overview",
+  "supportUrl": "https://plane.so/contact"
+}
