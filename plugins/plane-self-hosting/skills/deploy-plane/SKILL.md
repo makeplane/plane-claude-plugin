@@ -73,39 +73,67 @@ If the target is a different machine than the one Claude Code runs on, say that 
 smoothest path is to run Claude Code on the target (or a host with `kubectl` access to the
 cluster). Use `ssh <host> '<command>'` only if the user asks for it and confirms the host.
 
-## Step 2 — Recommend, then ask (one round)
+## Step 2 — Recommend, then ask (two short rounds)
 
-Use `references/choosing-a-method.md` to filter the options to what the probe found and to
-pick a recommendation. Ask everything in **one round**. If a structured question tool such as
-AskUserQuestion is available, use it: single-select for edition and method (recommended option
-first), multi-select for add-ons. Otherwise ask as a short numbered list.
+Use `references/choosing-a-method.md` and the probe to drop the options that can't work. Put the
+recommended option first and say in one line why. Skip any question that has only one answer
+left, and say what you picked instead. If a structured question tool such as AskUserQuestion is
+available, use it. It takes at most four questions per call and four options per question, which
+is why the questions are grouped as below. Otherwise ask the same questions as a short numbered
+list.
 
-1. **Edition** — Community (free, open source) or Commercial (Pro / Business / Enterprise
+**Round 1: where and what**
+
+1. **Edition**: Community (free, open source) or Commercial (Pro / Business / Enterprise
    features; runs on the Free plan until a license is activated). If the user has a license
    key or a `license_key.json`, it is Commercial.
-2. **Method** — only the ones that fit the probe:
-   - **Docker**: prime-cli (Commercial, Linux, managed lifecycle) · Docker Compose (both
-     editions, full control over the files) · Docker AIO (one container, evaluation only, needs
-     external Postgres/Redis/RabbitMQ/S3)
-   - **Kubernetes**: Helm chart (`plane-enterprise` or `plane-ce`)
-   - **Other**: Podman quadlets · Docker Swarm · Portainer · Coolify · air-gapped bundle
-3. **Add-ons** (multi-select, **Commercial only** — skip this question for Community) — from
-   `references/add-ons.md`, filtered by method: Plane AI, advanced search (OpenSearch),
-   integrations (GitHub / GitLab / Slack / …), intake email, Argus. Add-ons can be enabled
-   later, so default to none. Outbound email (SMTP) is set in God Mode for every edition.
-4. **Data services** — bundled (default) or external, per service: PostgreSQL, Redis/Valkey,
-   RabbitMQ, object storage (MinIO vs S3-compatible). AIO always needs all four external.
-5. **Access** — the domain or IP users will visit, and TLS: Let's Encrypt (public DNS to this
-   host), an existing certificate, cert-manager (Kubernetes), or plain HTTP.
-6. **Version** — default to the latest stable release; ask only if the user wants to pin.
+2. **Platform**: Docker on this host · Kubernetes (name the context) · another container
+   platform (Podman, Swarm, Portainer, Coolify). If every Plane endpoint is unreachable, the
+   target is air-gapped: say so and confirm it instead of asking.
+3. **TLS**: Let's Encrypt (public DNS to this host) · an existing certificate · cert-manager
+   (only when the probe found it on the cluster) · plain HTTP. The domain or IP has no fixed
+   options. Ask for it in plain text if the user hasn't given it.
 
-Ask follow-ups only for what the chosen add-ons require (for example, which LLM provider for
-Plane AI). Ask again only if an answer conflicts with what the probe found.
+**Round 2: how, based on round 1**
+
+4. **Method** within the platform:
+   - Docker, Commercial: prime-cli (Linux, managed lifecycle) · Docker Compose (full control
+     over the files) · Docker AIO (one container, evaluation only, needs external
+     Postgres/Redis/RabbitMQ/S3)
+   - Docker, Community: Docker Compose via `setup.sh` · Docker AIO (evaluation only)
+   - Kubernetes: the Helm chart (`plane-enterprise` or `plane-ce`). Nothing to ask.
+   - Other: the ones the probe supports among Podman quadlets, Docker Swarm, Portainer and Coolify
+5. **Data services**: bundled (default) · all external · some external (then ask which):
+   PostgreSQL, Redis/Valkey, RabbitMQ, object storage (MinIO or S3-compatible). AIO needs all
+   four external, so skip this question for AIO and say so.
+6. **Add-ons** (**Commercial only**, skip for Community): two multi-select questions with none
+   selected by default, each listing only the add-ons that the availability table in
+   `references/add-ons.md` shows for the chosen method:
+   - AI and search: Plane AI · advanced search (OpenSearch) · Plane MCP server
+   - Workflow and integrations: integrations (GitHub / GitLab / Slack / …) · intake email ·
+     Argus (sensitive-data scanning)
+
+Default to the latest stable release. Ask about the version only if the user wants to pin
+one. Ask follow-ups only for what the chosen add-ons require, for example which LLM provider
+for Plane AI. Ask again only if an answer conflicts with what the probe found.
+
+**Not a question: the baseline.** Every install runs web, space (public pages and published
+views), admin (God Mode), live (real-time collaboration), api and the workers. Commercial adds
+silo, live-exporter, and the event-stream services behind automations and webhooks:
+outbox-poller, the automation, webhook and agent consumers, iframely, and the automations
+runner. Outbound email (SMTP) is set in God Mode for every edition. The Commercial Compose,
+prime-cli, Swarm, Portainer and Coolify bundles run the whole baseline by default. Three
+methods need help:
+- **Kubernetes**: the chart leaves part of the baseline off, and
+  `references/kubernetes-commercial.md` turns it back on.
+- **AIO**: needs `ENABLE_RUNNER=1`.
+- **Podman**: `references/other-platforms.md` lists the units to start.
 
 ## Step 3 — Confirm a plan
 
 Before changing anything, show a plan and wait for a yes: edition, method, version, target
-(host or context + namespace), URL and TLS, add-ons, bundled vs external services, the files
+(host or context + namespace), URL and TLS, add-ons, any baseline services you are turning on
+beyond the method's defaults (Kubernetes), bundled vs external services, the files
 you will create (paths), the secrets you will generate (names only), and the commands you will
 run. Call out anything below the resource minimum or not production-grade.
 
@@ -124,6 +152,12 @@ Read exactly the references for the chosen path. Do not load the others.
 | Podman · Swarm · Portainer · Coolify | `references/other-platforms.md` |
 | No internet on the target | `references/airgapped.md` |
 | Any add-on or external service | the matching section of `references/add-ons.md` |
+
+After downloading the compose file, or after `helm show values`, compare its services with the
+ones `references/add-ons.md` and the baseline cover. A newer release can add services, such as
+flux, pane or bridge, which are in the Plane source but not in v4.0.1 or chart 3.11.x. Name any
+service you don't recognize to the user, along with its default from the file. Don't enable,
+disable or tune it on your own.
 
 ## Step 5 — Verify, then license
 

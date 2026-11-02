@@ -14,6 +14,22 @@ When the user picks an add-on, explain in one line what it gives them and what i
 
 Kubernetes keys are in `kubernetes-commercial.md`. This file covers the env-file methods.
 
+## Availability by method
+
+Offer only the add-ons available for the chosen method (as of v4.0.1 and chart 3.11.x):
+
+| Add-on | Compose, prime-cli | AIO | Kubernetes | Podman, Swarm, Portainer, Coolify |
+| --- | --- | --- | --- | --- |
+| Plane AI | yes | `ENABLE_PLANE_AI=1` | yes | yes |
+| Advanced search | external OpenSearch only | external OpenSearch only | bundled or external | external OpenSearch only |
+| Integrations | yes (Silo runs by default) | yes | yes | yes |
+| Intake email | yes | always runs | cert-manager TLS mode only | no |
+| Argus | yes | `ENABLE_ARGUS=1` | yes | yes |
+| Plane MCP server | no | no | yes | no |
+
+The air-gapped bundle has no intake email. Plane AI there needs an LLM endpoint that the
+air-gapped network can reach.
+
 ## Plane AI (Pi)
 
 What it gives: AI chat, agents and AI actions in the app. It needs an LLM provider key that the

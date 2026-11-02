@@ -40,9 +40,10 @@ are credentials.
   - `MACHINE_SIGNATURE`: leave it unset and the container generates one into `/app/data`, so
     mount that volume. Or set your own: at least 24 characters of `[A-Za-z0-9_-]`, such as
     `uuidgen`. Anything else is ignored with a warning.
+  - Baseline: `ENABLE_RUNNER=1` (+ `RUNNER_HMAC_SECRET_KEY` on releases after v4.0.1), so
+    scripted automations work as they do on Compose.
   - Add-ons: `ENABLE_PLANE_AI=1` (+ `PLANE_PI_DATABASE_URL` and the LLM / embedding keys from
-    `add-ons.md`), `ENABLE_ARGUS=1` (+ a 32+ character `ARGUS_FINGERPRINT_SECRET`),
-    `ENABLE_RUNNER=1` (+ `RUNNER_HMAC_SECRET_KEY` on releases after v4.0.1). Integrations use
+    `add-ons.md`), `ENABLE_ARGUS=1` (+ a 32+ character `ARGUS_FINGERPRINT_SECRET`). Integrations use
     the `GITHUB_*`, `SLACK_*`, `GITLAB_*` and `SENTRY_*` keys. Advanced search uses `OPENSEARCH_*`.
     Intake email always runs in AIO.
 - **Community**: always pass both secrets. Otherwise they are regenerated into a file outside

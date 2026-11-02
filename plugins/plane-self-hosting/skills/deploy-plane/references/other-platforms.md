@@ -22,6 +22,9 @@ the domain, and generates `MACHINE_SIGNATURE` and `ARGUS_FINGERPRINT_SECRET`. Re
 other shipped secrets in its `plane.env` before the first start.
 
 - Units load `EnvironmentFile=plane.env`, so every key in the file reaches the containers.
+- `install.sh` prints the units to start, but its list leaves out `silo`, `runner` and
+  `live-exporter`. Start those three as well, or integrations, scripted automations and PDF/DOCX
+  export won't work. Start the `pi-*` and `argus*` units only when the user picked those add-ons.
 - No `*_REPLICAS`. You enable an add-on by starting its unit:
   `systemctl --user start <unit>` and `systemctl --user enable <unit>`. Rootless installs use
   `systemctl --user`, and rootful installs use `systemctl`.

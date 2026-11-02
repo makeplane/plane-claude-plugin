@@ -8,7 +8,7 @@ why. Ask the user only to choose among the options that fit.
 | | Community | Commercial |
 | --- | --- | --- |
 | License | Free, open source | Runs on the Free plan until a key is activated, then Pro / Business (per workspace) or Enterprise Grid (whole instance) |
-| Add-ons | None. Only TLS and external datastores | Plane AI, advanced search, integrations, intake email, automations runner, Argus |
+| Add-ons | None. Only TLS and external datastores | Plane AI, advanced search, integrations, intake email, Argus, Plane MCP server (Kubernetes only) |
 | Latest release | `makeplane/plane` GitHub releases (v1.4.3 as of 2026-11) | prime.plane.so releases (v4.0.1 as of 2026-11) |
 
 The user can start on Commercial without a key and activate later. Moving from Community to

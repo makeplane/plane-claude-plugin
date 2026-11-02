@@ -9,10 +9,16 @@ with Plane AI"* or *"upgrade our Plane instance"*. The `deploy-plane` skill then
 1. **Probes** the machine read-only: OS, CPU, RAM and disk, Docker / Podman / Swarm, Kubernetes
    contexts with their ingress, storage class, cert-manager and OpenShift, any existing Plane,
    and whether Plane's endpoints are reachable.
-2. **Recommends and asks** in one round: the edition; the method (prime-cli, Docker Compose,
-   Docker AIO, Kubernetes Helm, Podman, Swarm, Portainer, Coolify or air-gapped); the add-ons
-   (Plane AI, advanced search, integrations, intake email, Argus); bundled or external
-   Postgres / Redis / RabbitMQ / S3; and the domain and TLS.
+2. **Recommends and asks** in two short rounds, offering only what the probe says can run:
+   - First, the edition, the platform (Docker, Kubernetes, or Podman / Swarm / Portainer /
+     Coolify), and the domain and TLS.
+   - Then the method on that platform (prime-cli, Docker Compose or Docker AIO; Helm on
+     Kubernetes), bundled or external Postgres / Redis / RabbitMQ / S3, and the add-ons that
+     method supports (Plane AI, advanced search, Plane MCP server, integrations, intake email,
+     Argus).
+
+   Core services, including Space and the automation and webhook services, are always
+   installed.
 3. **Confirms a plan**, then installs, generating every secret straight into files. Secrets are
    never printed, and nothing you type in as a secret passes through the chat.
 4. **Verifies** the services and health endpoints, walks you through the God Mode first login

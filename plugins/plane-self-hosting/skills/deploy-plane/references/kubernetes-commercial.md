@@ -68,9 +68,27 @@ env:
     cursor_webhook_secret: $(openssl rand -hex 32)
   pi_envs:
     internal_secret: $(openssl rand -hex 32)
+  runner_envs:
+    hmac_secret_key: $(openssl rand -hex 32)
+services:
+  # On by default in every Compose bundle, off by default in the chart. Without them,
+  # automations, webhooks, agents and link previews do nothing.
+  outbox_poller: {enabled: true}
+  automation_consumer: {enabled: true}
+  webhook_consumer: {enabled: true}
+  agent_consumer: {enabled: true}
+  iframely: {enabled: true}
+  runner: {enabled: true}
 EOF
 chmod 600 plane-values.yaml
 ```
+
+The `services:` block is the baseline from `SKILL.md`. List it in the plan as the services
+you are turning on beyond the chart's defaults. Merge each add-on's `services.<name>` keys into
+this same block rather than adding a second `services:` key. Other services the chart leaves
+off are optional: `external_api` (a separate Deployment for `/api/v1`), `worker_importers` (large
+imports) and `drawio` (`local_setup: true` self-hosts the diagram editor, for networks that
+can't reach diagrams.net).
 
 Then add the sections for each chosen add-on, datastore and TLS mode below. Don't set
 `license.licenseServer`. Its default, `https://prime.plane.so`, is right for every online
@@ -115,7 +133,6 @@ clusters with External Secrets Operator, the chart reads existing Secrets throug
 | Advanced search (OpenSearch) | Bundled: `services.opensearch.local_setup: true` plus a generated `services.opensearch.password` (~500m / 2Gi, 5Gi volume). External: `env.opensearch_remote_url` + `opensearch_remote_username` / `opensearch_remote_password` (+ `opensearch_index_prefix`) | Pro feature. After enabling, build the indexes: `kubectl -n plane exec deploy/<release>-api-wl -- python manage.py manage_search_index index rebuild --force` and then `… document index --force`. Confirm the Deployment name with `kubectl get deploy` |
 | Integrations (Silo) | `services.silo.enabled` (on by default) + `services.silo.connectors.<slack\|github\|gitlab\|sentry\|bitbucket\|hubspot>.enabled: true` with that provider's keys (`client_id`, `client_secret`, and per provider `signing_secret`, `app_name`, `app_id`, `private_key`, `webhook_secret`, `base_url`, `integration_slug`) | The user creates the OAuth/GitHub app on the provider side and types the secrets into the file. Large imports: `services.worker_importers.enabled: true` |
 | Intake email | `services.email_service.enabled: true`, `env.email_service_envs.smtp_domain: <intake domain>`, **and** cert-manager mode (`ssl.createIssuer` + `ssl.generateCerts`) | Creates a LoadBalancer Service for ports 25 / 465 / 587, which isn't configurable. Point MX at that address. With `ssl.tls_secret_name`, without `smtp_domain`, or with `ingress.enabled: false`, the email pod waits forever on a TLS Secret that never appears, so don't enable it in those setups |
-| Automations runner | `services.runner.enabled: true`, `env.runner_envs.hmac_secret_key: $(openssl rand -hex 32)` | The key has no default. The runner image from releases after v4.0.1 refuses to start in production without it |
 | Argus | `services.argus.enabled: true`, `env.argus_envs.fingerprint_secret: $(openssl rand -hex 32)` (32+ chars or the render fails) | Generate it once and keep it. Rotating it invalidates stored fingerprints |
 | Plane MCP server | `services.mcp_server.enabled: true` + `plane_oauth.client_id` / `client_secret` | The render fails without the OAuth pair |
 
