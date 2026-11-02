@@ -1,52 +1,38 @@
-# Plane plugin for Claude Code
+# Plane plugins for Claude Code
 
-Integrate [Plane](https://plane.so) — the open-source project management tool — directly into Claude Code. Create work items, triage intake, generate standups, and track cycles without leaving your terminal.
+The official [Plane](https://plane.so) plugin marketplace for Claude Code.
 
-## What's included
-
-- **MCP server** — connects Claude Code to Plane over OAuth (Plane Cloud). All Plane tools (work items, cycles, modules, projects, intake, pages, and more) are available to Claude automatically.
-
-That's it. No wrappers, no proxy scripts — just a thin plugin that wires Claude Code into Plane's hosted MCP server.
+| Plugin | What it does |
+| --- | --- |
+| [`plane`](./plugins/plane) | Work with your Plane Cloud workspace from Claude Code through Plane's hosted MCP server: work items, cycles, modules, intake, pages and more. |
+| [`plane-self-hosting`](./plugins/plane-self-hosting) | Deploy, upgrade and troubleshoot self-hosted Plane, Community or Commercial, on your own infrastructure. Claude probes your Docker host or Kubernetes cluster, asks which install method and add-ons you want, then installs and verifies. |
 
 ## Install
 
-```bash
-claude plugin install plane
+In a Claude Code session (2.1.275 or later):
+
+```text
+/plugin install plane-self-hosting --marketplace makeplane/plane-claude-plugin
+/plugin install plane --marketplace makeplane/plane-claude-plugin
 ```
 
-Or, for local development:
+Or from your shell:
 
 ```bash
-claude --plugin-dir /path/to/plane-claude-plugin
+claude plugin marketplace add makeplane/plane-claude-plugin
+claude plugin install plane-self-hosting@makeplane
+claude plugin install plane@makeplane
 ```
 
-On first use, Claude will open a browser window to authenticate with Plane. Sign in with the workspace you want to work against.
+Updates arrive through the marketplace. Run `claude plugin marketplace update makeplane`, then
+`claude plugin update plane-self-hosting@makeplane`.
 
-## Requirements
+## Developing
 
-- Claude Code v2.1 or later
-- A [Plane Cloud](https://app.plane.so) workspace (self-hosted Plane is not supported in this version — see roadmap below)
-- Node.js isn't required; the plugin uses Claude Code's native HTTP MCP transport
+```bash
+claude plugin validate .                                  # marketplace + every plugin
+claude --plugin-dir ./plugins/plane-self-hosting          # try a plugin without installing it
+```
 
-## Usage
-
-Once installed and authenticated, ask Claude anything about your Plane workspace in natural language:
-
-- "What's assigned to me in the Frontend project?"
-- "Create a bug: login flash on mobile Safari, blocking sign-in"
-- "Summarize my activity in Plane since yesterday for standup"
-- "Walk me through the intake inbox for Backend"
-- "How's the current cycle for Mobile looking?"
-
-Claude picks the right Plane MCP tools automatically and asks for confirmation before writes.
-
-## Roadmap
-
-- Bundled skills for common workflows (new-issue, standup, triage, cycle-status)
-- PAT / API-key auth (for CI and automation)
-- Self-hosted Plane support
-- Subagent for feature decomposition (initiative → epics → work items)
-
-## Feedback
-
-File issues at [github.com/makeplane/plane-claude-plugin](https://github.com/makeplane/plane-claude-plugin/issues).
+Each plugin's version lives in its `.claude-plugin/plugin.json`. Bump it with every change you
+want installed users to receive.

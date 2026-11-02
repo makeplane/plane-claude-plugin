@@ -1,0 +1,44 @@
+{
+  "name": "makeplane",
+  "description": "Official Plane plugins for Claude Code: work with your Plane workspace, and deploy and run self-hosted Plane.",
+  "owner": {
+    "name": "Plane",
+    "url": "https://plane.so"
+  },
+  "plugins": [
+    {
+      "name": "plane",
+      "source": "./plugins/plane",
+      "description": "Work with your Plane Cloud workspace from Claude Code through Plane's hosted MCP server: work items, cycles, modules, intake, pages and more.",
+      "category": "productivity",
+      "homepage": "https://plane.so",
+      "repository": "https://github.com/makeplane/plane-claude-plugin",
+      "license": "Apache-2.0",
+      "keywords": ["plane", "project-management", "work-items", "cycles", "mcp"]
+    },
+    {
+      "name": "plane-self-hosting",
+      "source": "./plugins/plane-self-hosting",
+      "description": "Deploy, upgrade and troubleshoot self-hosted Plane (Community or Commercial) on your own infrastructure: Docker AIO, Docker Compose, prime-cli, Kubernetes, Podman, Swarm, Portainer, Coolify or air-gapped. Claude probes your infrastructure, asks which method and add-ons you want, then installs and verifies.",
+      "category": "devops",
+      "homepage": "https://developers.plane.so/self-hosting/overview",
+      "repository": "https://github.com/makeplane/plane-claude-plugin",
+      "license": "Apache-2.0",
+      "keywords": ["plane", "self-hosting", "deployment", "docker", "kubernetes", "helm", "devops"],
+      "relevance": {
+        "topic": "self-hosted Plane",
+        "signals": {
+          "cli": ["prime-cli"],
+          "hosts": ["prime.plane.so", "helm.plane.so", "artifacts.plane.so"],
+          "filesRead": ["**/plane-app/plane.env", "**/plane.env", "**/plane-selfhost/**"],
+          "manifestDeps": [
+            {
+              "file": "docker-compose[^/\\\\]*\\.ya?ml$",
+              "pattern": "makeplane/(plane|[a-z-]+-commercial)"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
